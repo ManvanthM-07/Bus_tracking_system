@@ -155,6 +155,10 @@ Login Processing...
 
 <h2>{{ role|capitalize }} Login</h2>
 
+{% if request.args.get('msg') %}
+<div style="color: #4cd137; margin-bottom: 15px;">✅ {{ request.args.get('msg') }}</div>
+{% endif %}
+
 <form method="POST" action="/login" onsubmit="startLoading()">
 
 <input class="input-box" type="text" name="username" placeholder="Username" required>
@@ -172,6 +176,10 @@ Login
 </button>
 
 </form>
+
+{% if role != 'admin' %}
+<p style="margin-top:20px; color:white;">Don't have an account? <a href="/signup/{{ role }}" style="color:#ffe082;">Sign Up</a></p>
+{% endif %}
 
 </div>
 

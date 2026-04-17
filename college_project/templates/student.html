@@ -106,11 +106,11 @@ document.addEventListener("click", function(e) {
 
 <div class="dashboard-card">
 
-    <!-- ✅ SAFE USER INFO -->
+    <!-- ✅ DYNAMIC USER INFO -->
     <div class="user-info">
-        <h3>👋 Welcome {{ user.username if user else "Student" }}</h3>
-        <p>🚌 Bus: Bus 1</p>
-        <p>📍 Stop: Bogadi</p>
+        <h3>👋 Welcome {{ user.full_name or user.username }}</h3>
+        <p>🚌 Bus: {{ user.assigned_bus or "No Bus Assigned" }}</p>
+        <p>📍 Stop: {{ user.assigned_stop or "No Stop Assigned" }}</p>
     </div>
 
     <!-- ✅ BUTTONS -->
