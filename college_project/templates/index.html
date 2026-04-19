@@ -1,117 +1,206 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>BusTrack — Select Role</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"/>
-  <style>
-    body { overflow: hidden; }
-    .page-scene { padding-top: 70px; }
-    .hero { text-align: center; margin-bottom: 40px; }
-    .hero .badge { margin-bottom: 14px; }
-    .hero h1 { font-size: clamp(28px,5vw,44px); margin-bottom: 10px; }
-    .hero p  { font-size: 15px; color: var(--muted); }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BusTrack — The Future of Transit</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}"
+    />
+    <style>
+      /* Specific overrides for index page to ensure no grid lines */
+      .hero-container {
+        background: var(--cosmic-black);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="cursor"></div>
+    <div id="aura"></div>
+    <canvas id="particle-field"></canvas>
 
-    /* animated route line */
-    .route-line {
-      position: fixed;
-      top: 0; bottom: 0;
-      left: 50%;
-      width: 1px;
-      background: linear-gradient(180deg, transparent, rgba(6,182,212,0.18), transparent);
-      z-index: 1;
-      pointer-events: none;
-    }
+    <!-- HUD ELEMENTS -->
+    <div class="hud-corner hud-tl">
+      <span class="hud-label">Terminal</span
+      ><span class="hud-value">TX-800 // ACTIVE</span>
+    </div>
+    <div class="hud-corner hud-tr">
+      <span class="hud-label">Network</span
+      ><span class="hud-value">ENCRYPTED</span>
+    </div>
+    <div class="hud-corner hud-bl">
+      <span class="hud-label">Sector</span
+      ><span class="hud-value">A-12 CAMPUS</span>
+    </div>
+    <div class="hud-corner hud-br">
+      <span class="hud-label">Time</span
+      ><span class="hud-value" id="hud-time">--:--:--</span>
+    </div>
 
-    /* role card overrides */
-    .role-card-wrap {
-      display: grid;
-      grid-template-columns: repeat(4, 200px);
-      gap: 20px;
-      justify-content: center;
-    }
-    @media(max-width:900px){ .role-card-wrap{ grid-template-columns: repeat(2,180px); } }
-    @media(max-width:460px){ .role-card-wrap{ grid-template-columns: repeat(2,1fr); gap:12px; } }
-
-    .role-card { padding: 36px 16px 28px; }
-    .role-label { font-size: 16px; font-weight: 700; }
-    .role-desc  { font-size: 11px; color: var(--muted); margin-top: 4px; }
-
-    /* SVG icons inline */
-    .role-icon svg { width: 26px; height: 26px; }
-  </style>
-</head>
-<body>
-<canvas id="stars"></canvas>
-<div class="road-plane"></div>
-<div class="particles" id="particles"></div>
-
-<!-- top bar -->
-<nav class="topbar">
-  <span class="topbar-brand">BusTrack</span>
-  <div class="topbar-right">
-    <span class="topbar-badge"><span class="topbar-dot"></span>Live</span>
-  </div>
-</nav>
-
-<div class="page-scene">
-  <div class="hero">
-    <div class="badge"><span class="badge-dot"></span>Select Your Role</div>
-    <h1>College Bus Time Tracker</h1>
-    <p>Real-Time GPS Bus Tracking System</p>
-  </div>
-
-  <div class="role-card-wrap">
-
-    <a href="/student" class="role-card" id="role-student">
-      <div class="role-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="#06b6d4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/>
-        </svg>
+    <!-- HERO SECTION -->
+    <section class="hero-container">
+      <div class="hero-content">
+        <div
+          class="topbar-badge"
+          style="
+            margin-bottom: 20px;
+            border-color: var(--neon-cyan);
+            color: var(--neon-cyan);
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            border: 1px solid;
+            font-size: 12px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+          "
+        >
+          <span
+            class="topbar-dot"
+            style="
+              background: var(--neon-cyan);
+              display: inline-block;
+              width: 8px;
+              height: 8px;
+              border-radius: 50%;
+              margin-right: 8px;
+            "
+          ></span>
+          System Version 3.0.4
+        </div>
+        <h1
+          class="hero-big-text"
+          style="font-size: 120px; margin: 0; padding: 0"
+        >
+          TRANSIT<br />EVOLVED
+        </h1>
+        <p
+          style="
+            font-size: 20px;
+            color: var(--text-dim);
+            max-width: 600px;
+            margin: 20px auto;
+          "
+        >
+          Experience the most advanced 3D bus tracking system ever built.
+          Precision, safety, and speed—unified in one cinematic interface.
+        </p>
+        <a href="#roles" class="magnetic-btn" style="text-decoration: none"
+          >Initiate Tracking</a
+        >
       </div>
-      <div class="role-label">Student</div>
-      <div class="role-desc">Track your bus & timings</div>
-    </a>
+    </section>
 
-    <a href="/parent" class="role-card" id="role-parent">
-      <div class="role-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
-        </svg>
+    <!-- BENTO BOX FEATURES -->
+    <section class="bento-section" id="bento">
+      <div class="bento-grid">
+        <div class="bento-item bento-1">
+          <div class="bento-title">Real-Time Core</div>
+          <p class="bento-desc">
+            Our proprietary sub-second latency engine syncs fleet data across
+            thousands of nodes instantly. Never miss a stop with our hyper-local
+            GPS tracking.
+          </p>
+        </div>
+
+        <div class="bento-item bento-2">
+          <div class="bento-title">Visual Intelligence</div>
+          <p class="bento-desc">
+            3D rendering of bus routes and traffic patterns gives you a visual
+            edge. See the campus like never before with our interactive
+            street-view mode.
+          </p>
+        </div>
+
+        <div class="bento-item bento-3">
+          <div class="bento-title">SafeLink</div>
+          <p class="bento-desc">
+            Encrypted data channels for student and parent peace of mind.
+          </p>
+        </div>
+
+        <div
+          class="bento-item bento-4"
+          style="
+            background: linear-gradient(
+              135deg,
+              var(--neon-purple),
+              var(--neon-cyan)
+            );
+            color: #000;
+          "
+        >
+          <div class="bento-title" style="color: #000">1.2ms</div>
+          <p class="bento-desc" style="color: rgba(0, 0, 0, 0.7)">
+            Industry-leading sync speed.
+          </p>
+        </div>
       </div>
-      <div class="role-label">Parent</div>
-      <div class="role-desc">Monitor your child's bus</div>
-    </a>
+    </section>
 
-    <a href="/driver" class="role-card" id="role-driver">
-      <div class="role-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="2" y="7" width="20" height="14" rx="2"/>
-          <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>
-          <circle cx="7" cy="17" r="1"/><circle cx="17" cy="17" r="1"/>
-          <path d="M12 12v4"/>
-        </svg>
+    <!-- ROLE SELECTION (Cinematic Style) -->
+    <section
+      class="scroll-section"
+      id="roles"
+      style="padding: 100px 40px; max-width: 1400px; margin: 0 auto"
+    >
+      <h2
+        style="
+          font-family: &quot;Outfit&quot;;
+          font-size: 80px;
+          text-align: center;
+          margin-bottom: 60px;
+        "
+      >
+        ACCESS LEVEL
+      </h2>
+      <div
+        style="
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+          gap: 20px;
+          width: 100%;
+        "
+      >
+        <a
+          href="/student"
+          class="bento-item"
+          style="text-align: center; display: block; text-decoration: none"
+        >
+          <h3 class="bento-title">STUDENT</h3>
+          <p class="bento-desc">Level 01 Access — Timings & ETA</p>
+        </a>
+
+        <a
+          href="/parent"
+          class="bento-item"
+          style="text-align: center; display: block; text-decoration: none"
+        >
+          <h3 class="bento-title">PARENT</h3>
+          <p class="bento-desc">Level 02 Access — Safety Monitoring</p>
+        </a>
+
+        <a
+          href="/driver"
+          class="bento-item"
+          style="text-align: center; display: block; text-decoration: none"
+        >
+          <h3 class="bento-title">DRIVER</h3>
+          <p class="bento-desc">Level 03 Access — Route Mgmt</p>
+        </a>
+
+        <a
+          href="/admin"
+          class="bento-item"
+          style="text-align: center; display: block; text-decoration: none"
+        >
+          <h3 class="bento-title">ADMIN</h3>
+          <p class="bento-desc">Level 04 Access — Full Override</p>
+        </a>
       </div>
-      <div class="role-label">Driver</div>
-      <div class="role-desc">Manage your route & location</div>
-    </a>
+    </section>
 
-    <a href="/admin" class="role-card" id="role-admin">
-      <div class="role-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2z"/>
-          <path d="M12 8v4l3 3"/>
-        </svg>
-      </div>
-      <div class="role-label">Admin</div>
-      <div class="role-desc">Manage system & users</div>
-    </a>
-
-  </div>
-</div>
-
-<div class="route-line"></div>
-<script src="{{ url_for('static', filename='css/anim.js') }}"></script>
-</body>
+    <script src="{{ url_for('static', filename='css/anim.js') }}"></script>
+  </body>
 </html>

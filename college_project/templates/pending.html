@@ -1,99 +1,119 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Account Pending — BusTrack</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"/>
-  <style>
-    body { overflow:hidden; }
-    .pending-wrap { width:100%; max-width:460px; padding:48px 40px; text-align:center; }
-    .icon-ring {
-      width:80px; height:80px; border-radius:50%;
-      background: rgba(245,158,11,0.1);
-      border: 2px solid rgba(245,158,11,0.3);
-      display:flex; align-items:center; justify-content:center;
-      margin:0 auto 24px;
-    }
-    .icon-ring svg { width:36px; height:36px; }
-    .pending-wrap h2 {
-      font-size:28px; font-weight:800; letter-spacing:-0.02em; margin-bottom:12px;
-      background: linear-gradient(135deg,var(--white),var(--gold));
-      -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
-    }
-    .pending-wrap p { font-size:14px; color:var(--muted); line-height:1.7; margin-bottom:28px; }
-    .status-badge {
-      display:inline-flex; align-items:center; gap:8px;
-      background: rgba(245,158,11,0.1); border:1px solid rgba(245,158,11,0.3);
-      color:#fbbf24; border-radius:999px; padding:6px 18px;
-      font-size:12px; font-weight:600; letter-spacing:0.08em; text-transform:uppercase;
-      margin-bottom:24px;
-    }
-    .status-dot {
-      width:7px; height:7px; border-radius:50%; background:#fbbf24;
-      animation: sdot 1s ease-in-out infinite alternate;
-    }
-    @keyframes sdot { from{opacity:0.4;transform:scale(0.7)} to{opacity:1;transform:scale(1)} }
-    .home-btn {
-      display:inline-flex; align-items:center; gap:8px;
-      padding:13px 28px;
-      font-family:'Inter',sans-serif; font-size:14px; font-weight:700; color:#fff;
-      background: linear-gradient(135deg,var(--accent),var(--cyan));
-      border:none; border-radius:14px; cursor:pointer; text-decoration:none;
-      box-shadow:0 8px 28px rgba(59,130,246,0.38);
-      transition: transform 0.2s, box-shadow 0.2s;
-    }
-    .home-btn:hover { transform:translateY(-2px); box-shadow:0 14px 36px rgba(59,130,246,0.55); }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Account Pending — BusTrack</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}"
+    />
+    <style>
+      body { overflow:hidden; }
+      .pending-wrap { width:100%; max-width:460px; padding:48px 40px; text-align:center; }
+      .icon-ring {
+        width:80px; height:80px; border-radius:50%;
+        background: rgba(245,158,11,0.1);
+        border: 2px solid rgba(245,158,11,0.3);
+        display:flex; align-items:center; justify-content:center;
+        margin:0 auto 24px;
+      }
+      .icon-ring svg { width:36px; height:36px; }
+      .pending-wrap h2 {
+        font-size:28px; font-weight:800; letter-spacing:-0.02em; margin-bottom:12px;
+        background: linear-gradient(135deg,var(--white),var(--gold));
+        -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+      }
+      .pending-wrap p { font-size:14px; color:var(--muted); line-height:1.7; margin-bottom:28px; }
+      .status-badge {
+        display:inline-flex; align-items:center; gap:8px;
+        background: rgba(245,158,11,0.1); border:1px solid rgba(245,158,11,0.3);
+        color:#fbbf24; border-radius:999px; padding:6px 18px;
+        font-size:12px; font-weight:600; letter-spacing:0.08em; text-transform:uppercase;
+        margin-bottom:24px;
+      }
+      .status-dot {
+        width:7px; height:7px; border-radius:50%; background:#fbbf24;
+        animation: sdot 1s ease-in-out infinite alternate;
+      }
+      @keyframes sdot { from{opacity:0.4;transform:scale(0.7)} to{opacity:1;transform:scale(1)} }
+      .home-btn {
+        display:inline-flex; align-items:center; gap:8px;
+        padding:13px 28px;
+        font-family:'Inter',sans-serif; font-size:14px; font-weight:700; color:#fff;
+        background: linear-gradient(135deg,var(--accent),var(--cyan));
+        border:none; border-radius:14px; cursor:pointer; text-decoration:none;
+        box-shadow:0 8px 28px rgba(59,130,246,0.38);
+        transition: transform 0.2s, box-shadow 0.2s;
+      }
+      .home-btn:hover { transform:translateY(-2px); box-shadow:0 14px 36px rgba(59,130,246,0.55); }
 
-    {% if error %}
-    .error-box {
-      background: rgba(239,68,68,0.08); border:1px solid rgba(239,68,68,0.28);
-      color:#f87171; border-radius:10px; padding:10px 14px;
-      font-size:13px; margin-bottom:16px;
-    }
-    {% endif %}
-  </style>
-</head>
-<body>
-<canvas id="stars"></canvas>
-<div class="road-plane"></div>
-<div class="particles" id="particles"></div>
+      {% if error %}
+      .error-box {
+        background: rgba(239,68,68,0.08); border:1px solid rgba(239,68,68,0.28);
+        color:#f87171; border-radius:10px; padding:10px 14px;
+        font-size:13px; margin-bottom:16px;
+      }
+      {% endif %}
+    </style>
+  </head>
+  <body>
+    <canvas id="stars"></canvas>
+    <div class="road-plane"></div>
+    <div class="particles" id="particles"></div>
 
-<nav class="topbar">
-  <span class="topbar-brand">BusTrack</span>
-</nav>
+    <nav class="topbar">
+      <span class="topbar-brand">BusTrack</span>
+    </nav>
 
-<div class="page-scene">
-  <div class="card pending-wrap">
+    <div class="page-scene">
+      <div class="card pending-wrap">
+        <div class="icon-ring">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="#f59e0b"
+            stroke-width="1.8"
+            stroke-linecap="round"
+          >
+            <circle cx="12" cy="12" r="10" />
+            <polyline points="12 6 12 12 16 14" />
+          </svg>
+        </div>
 
-    <div class="icon-ring">
-      <svg viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="1.8" stroke-linecap="round">
-        <circle cx="12" cy="12" r="10"/>
-        <polyline points="12 6 12 12 16 14"/>
-      </svg>
+        <div class="status-badge">
+          <span class="status-dot"></span>Reviewing Application
+        </div>
+
+        <h2>Account Pending Approval</h2>
+        <p>
+          Thank you for registering! Your account is currently waiting for
+          administrator approval. You'll be able to access your dashboard as
+          soon as it's approved.
+        </p>
+
+        {% if error %}
+        <div class="error-box">Connection issue: {{ error }}</div>
+        {% endif %}
+
+        <a href="/" class="home-btn">
+          <svg
+            width="15"
+            height="15"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+          >
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+            <polyline points="9 22 9 12 15 12 15 22" />
+          </svg>
+          Back to Home
+        </a>
+      </div>
     </div>
 
-    <div class="status-badge">
-      <span class="status-dot"></span>Reviewing Application
-    </div>
-
-    <h2>Account Pending Approval</h2>
-    <p>Thank you for registering! Your account is currently waiting for administrator approval. You'll be able to access your dashboard as soon as it's approved.</p>
-
-    {% if error %}
-    <div class="error-box">Connection issue: {{ error }}</div>
-    {% endif %}
-
-    <a href="/" class="home-btn">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-        <polyline points="9 22 9 12 15 12 15 22"/>
-      </svg>
-      Back to Home
-    </a>
-  </div>
-</div>
-
-<script src="{{ url_for('static', filename='css/anim.js') }}"></script>
-</body>
+    <script src="{{ url_for('static', filename='css/anim.js') }}"></script>
+  </body>
 </html>

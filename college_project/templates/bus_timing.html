@@ -1,197 +1,408 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Bus Timing — BusTrack</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"/>
-  <style>
-    body { overflow-y: auto; }
-    .timing-wrap { width:100%; max-width:700px; padding:32px 28px; margin-top:60px; margin-bottom:40px; }
-    .page-head { margin-bottom:24px; }
-    .page-head h2 { font-size:24px; font-weight:800;
-      background:linear-gradient(135deg,var(--white),var(--cyan));
-      -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text; }
-    .page-head p { font-size:13px; color:var(--muted); margin-top:4px; }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bus Timing — BusTrack</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}"
+    />
+    <style>
+      body {
+        overflow-y: auto;
+      }
+      .timing-wrap {
+        width: 100%;
+        max-width: 700px;
+        padding: 32px 28px;
+        margin-top: 60px;
+        margin-bottom: 40px;
+      }
+      .page-head {
+        margin-bottom: 24px;
+      }
+      .page-head h2 {
+        font-size: 24px;
+        font-weight: 800;
+        background: linear-gradient(135deg, var(--white), var(--cyan));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+      .page-head p {
+        font-size: 13px;
+        color: var(--muted);
+        margin-top: 4px;
+      }
 
-    /* Bus selector tabs */
-    .bus-tabs { display:flex; gap:10px; margin-bottom:24px; flex-wrap:wrap; }
-    .bus-tab {
-      padding:9px 20px; border-radius:10px; font-size:13px; font-weight:600;
-      border: 1px solid rgba(59,130,246,0.22);
-      background:rgba(59,130,246,0.06); color:var(--muted);
-      cursor:pointer; transition:all 0.2s;
-    }
-    .bus-tab.active, .bus-tab:hover {
-      background:rgba(59,130,246,0.18); border-color:var(--accent); color:var(--white);
-    }
+      /* Bus selector tabs */
+      .bus-tabs {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 24px;
+        flex-wrap: wrap;
+      }
+      .bus-tab {
+        padding: 9px 20px;
+        border-radius: 10px;
+        font-size: 13px;
+        font-weight: 600;
+        border: 1px solid rgba(59, 130, 246, 0.22);
+        background: rgba(59, 130, 246, 0.06);
+        color: var(--muted);
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      .bus-tab.active,
+      .bus-tab:hover {
+        background: rgba(59, 130, 246, 0.18);
+        border-color: var(--accent);
+        color: var(--white);
+      }
 
-    /* Info row */
-    .info-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:20px; }
-    .info-chip {
-      background:rgba(0,0,0,0.22); border:1px solid rgba(255,255,255,0.06);
-      border-radius:12px; padding:14px 16px;
-    }
-    .info-chip-label { font-size:11px; text-transform:uppercase; letter-spacing:0.07em; color:var(--muted); margin-bottom:4px; }
-    .info-chip-val { font-size:15px; font-weight:700; color:var(--gold); }
+      /* Info row */
+      .info-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin-bottom: 20px;
+      }
+      .info-chip {
+        background: rgba(0, 0, 0, 0.22);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        border-radius: 12px;
+        padding: 14px 16px;
+      }
+      .info-chip-label {
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.07em;
+        color: var(--muted);
+        margin-bottom: 4px;
+      }
+      .info-chip-val {
+        font-size: 15px;
+        font-weight: 700;
+        color: var(--gold);
+      }
 
-    /* Stops list */
-    .stops-title { font-size:13px; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:12px; }
-    .stop-list { display:flex; flex-direction:column; gap:8px; }
-    .stop-item {
-      display:flex; align-items:center; gap:14px;
-      padding:14px 16px; border-radius:12px;
-      background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06);
-      cursor:pointer; transition:all 0.2s;
-      position:relative; overflow:hidden;
-    }
-    .stop-item:hover { background:rgba(59,130,246,0.1); border-color:rgba(59,130,246,0.28); }
-    .stop-item.active-stop {
-      background:rgba(245,158,11,0.12); border-color:rgba(245,158,11,0.4);
-    }
-    .stop-item.active-stop::before {
-      content:''; position:absolute; left:0; top:0; bottom:0; width:3px;
-      background:var(--gold); border-radius:3px 0 0 3px;
-    }
-    .stop-num {
-      width:28px; height:28px; border-radius:8px;
-      background:rgba(59,130,246,0.12); color:var(--cyan);
-      font-size:12px; font-weight:700;
-      display:flex; align-items:center; justify-content:center; flex-shrink:0;
-    }
-    .stop-item.active-stop .stop-num { background:rgba(245,158,11,0.2); color:var(--gold); }
-    .stop-name { font-size:14px; font-weight:500; }
-    .bus-here {
-      margin-left:auto; font-size:11px; font-weight:600; color:var(--gold);
-      background:rgba(245,158,11,0.12); border:1px solid rgba(245,158,11,0.3);
-      border-radius:999px; padding:3px 10px; display:none;
-    }
-    .stop-item.active-stop .bus-here { display:block; }
+      /* Stops list */
+      .stops-title {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        margin-bottom: 12px;
+      }
+      .stop-list {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .stop-item {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 14px 16px;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        cursor: pointer;
+        transition: all 0.2s;
+        position: relative;
+        overflow: hidden;
+      }
+      .stop-item:hover {
+        background: rgba(59, 130, 246, 0.1);
+        border-color: rgba(59, 130, 246, 0.28);
+      }
+      .stop-item.active-stop {
+        background: rgba(245, 158, 11, 0.12);
+        border-color: rgba(245, 158, 11, 0.4);
+      }
+      .stop-item.active-stop::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 3px;
+        background: var(--gold);
+        border-radius: 3px 0 0 3px;
+      }
+      .stop-num {
+        width: 28px;
+        height: 28px;
+        border-radius: 8px;
+        background: rgba(59, 130, 246, 0.12);
+        color: var(--cyan);
+        font-size: 12px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+      .stop-item.active-stop .stop-num {
+        background: rgba(245, 158, 11, 0.2);
+        color: var(--gold);
+      }
+      .stop-name {
+        font-size: 14px;
+        font-weight: 500;
+      }
+      .bus-here {
+        margin-left: auto;
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--gold);
+        background: rgba(245, 158, 11, 0.12);
+        border: 1px solid rgba(245, 158, 11, 0.3);
+        border-radius: 999px;
+        padding: 3px 10px;
+        display: none;
+      }
+      .stop-item.active-stop .bus-here {
+        display: block;
+      }
 
-    .back-link {
-      display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--muted);
-      position:fixed;top:18px;left:22px;z-index:99;transition:color 0.2s;
-    }
-    .back-link:hover{color:var(--white);}
+      .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 13px;
+        color: var(--muted);
+        position: fixed;
+        top: 18px;
+        left: 22px;
+        z-index: 99;
+        transition: color 0.2s;
+      }
+      .back-link:hover {
+        color: var(--white);
+      }
 
-    /* Popup overlay */
-    .overlay {
-      position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:200;
-      display:none; align-items:center; justify-content:center;
-    }
-    .overlay.show { display:flex; }
-    .popup-card {
-      background:var(--blue2); border:1px solid var(--border);
-      border-radius:20px; padding:28px 32px; max-width:320px; width:90%;
-      box-shadow:0 24px 60px rgba(0,0,0,0.7);
-    }
-    .popup-title { font-size:16px; font-weight:700; margin-bottom:8px; }
-    .popup-info p { font-size:14px; color:var(--muted); margin:6px 0; }
-    .popup-close {
-      margin-top:20px; width:100%; padding:10px;
-      background:rgba(59,130,246,0.15); border:1px solid rgba(59,130,246,0.3);
-      color:var(--cyan); border-radius:10px; cursor:pointer; font-size:14px; font-weight:600;
-      transition:background 0.2s;
-    }
-    .popup-close:hover { background:rgba(59,130,246,0.25); }
-  </style>
-</head>
-<body>
-<canvas id="stars"></canvas>
-<div class="road-plane"></div>
-<div class="particles" id="particles"></div>
+      /* Popup overlay */
+      .overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.6);
+        z-index: 200;
+        display: none;
+        align-items: center;
+        justify-content: center;
+      }
+      .overlay.show {
+        display: flex;
+      }
+      .popup-card {
+        background: var(--blue2);
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        padding: 28px 32px;
+        max-width: 320px;
+        width: 90%;
+        box-shadow: 0 24px 60px rgba(0, 0, 0, 0.7);
+      }
+      .popup-title {
+        font-size: 16px;
+        font-weight: 700;
+        margin-bottom: 8px;
+      }
+      .popup-info p {
+        font-size: 14px;
+        color: var(--muted);
+        margin: 6px 0;
+      }
+      .popup-close {
+        margin-top: 20px;
+        width: 100%;
+        padding: 10px;
+        background: rgba(59, 130, 246, 0.15);
+        border: 1px solid rgba(59, 130, 246, 0.3);
+        color: var(--cyan);
+        border-radius: 10px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 600;
+        transition: background 0.2s;
+      }
+      .popup-close:hover {
+        background: rgba(59, 130, 246, 0.25);
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="stars"></canvas>
+    <div class="road-plane"></div>
+    <div class="particles" id="particles"></div>
 
-<nav class="topbar">
-  <span class="topbar-brand">BusTrack</span>
-  <div class="topbar-right">
-    <span class="topbar-badge"><span class="topbar-dot"></span>Live</span>
-  </div>
-</nav>
-
-<a href="/student_dashboard" class="back-link">
-  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
-  Dashboard
-</a>
-
-<div class="page-scene">
-  <div class="card timing-wrap">
-    <div class="page-head">
-      <div class="badge"><span class="badge-dot"></span>Schedule</div>
-      <h2>Bus Timing</h2>
-      <p>Select a bus to view its schedule and live stop progress</p>
-    </div>
-
-    <div class="bus-tabs">
-      <div class="bus-tab active" id="tab-1" onclick="selectBus(1)">Bus 1 — Main Route</div>
-      <div class="bus-tab" id="tab-2" onclick="selectBus(2)">Bus 2 — Ring Route</div>
-      <div class="bus-tab" id="tab-3" onclick="selectBus(3)">Bus 3 — City Route</div>
-    </div>
-
-    <div class="info-row">
-      <div class="info-chip">
-        <div class="info-chip-label">Departure</div>
-        <div class="info-chip-val" id="dep">8:30 AM</div>
+    <nav class="topbar">
+      <span class="topbar-brand">BusTrack</span>
+      <div class="topbar-right">
+        <span class="topbar-badge"><span class="topbar-dot"></span>Live</span>
       </div>
-      <div class="info-chip">
-        <div class="info-chip-label">Arrival</div>
-        <div class="info-chip-val" id="arr">9:15 AM</div>
+    </nav>
+
+    <a href="/student_dashboard" class="back-link">
+      <svg
+        width="15"
+        height="15"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+      >
+        <path d="M19 12H5M12 5l-7 7 7 7" />
+      </svg>
+      Dashboard
+    </a>
+
+    <div class="page-scene">
+      <div class="card timing-wrap">
+        <div class="page-head">
+          <div class="badge"><span class="badge-dot"></span>Schedule</div>
+          <h2>Bus Timing</h2>
+          <p>Select a bus to view its schedule and live stop progress</p>
+        </div>
+
+        <div class="bus-tabs">
+          <div class="bus-tab active" id="tab-1" onclick="selectBus(1)">
+            Bus 1 — Main Route
+          </div>
+          <div class="bus-tab" id="tab-2" onclick="selectBus(2)">
+            Bus 2 — Ring Route
+          </div>
+          <div class="bus-tab" id="tab-3" onclick="selectBus(3)">
+            Bus 3 — City Route
+          </div>
+        </div>
+
+        <div class="info-row">
+          <div class="info-chip">
+            <div class="info-chip-label">Departure</div>
+            <div class="info-chip-val" id="dep">8:30 AM</div>
+          </div>
+          <div class="info-chip">
+            <div class="info-chip-label">Arrival</div>
+            <div class="info-chip-val" id="arr">9:15 AM</div>
+          </div>
+        </div>
+
+        <div class="stops-title">Stops</div>
+        <div class="stop-list" id="stopList"></div>
       </div>
     </div>
 
-    <div class="stops-title">Stops</div>
-    <div class="stop-list" id="stopList"></div>
-  </div>
-</div>
-
-<!-- Popup -->
-<div class="overlay" id="overlay" onclick="closePopup()">
-  <div class="popup-card" onclick="event.stopPropagation()">
-    <div class="popup-title" id="popupStop">Stop</div>
-    <div class="popup-info">
-      <p>Morning Pickup: 8:30 AM</p>
-      <p>Evening Drop: 4:30 PM</p>
+    <!-- Popup -->
+    <div class="overlay" id="overlay" onclick="closePopup()">
+      <div class="popup-card" onclick="event.stopPropagation()">
+        <div class="popup-title" id="popupStop">Stop</div>
+        <div class="popup-info">
+          <p>Morning Pickup: 8:30 AM</p>
+          <p>Evening Drop: 4:30 PM</p>
+        </div>
+        <button class="popup-close" onclick="closePopup()">Close</button>
+      </div>
     </div>
-    <button class="popup-close" onclick="closePopup()">Close</button>
-  </div>
-</div>
 
-<script src="{{ url_for('static', filename='css/anim.js') }}"></script>
-<script>
-const buses = {
-  1:{dep:"8:30 AM",arr:"9:15 AM",stops:["Main Gate","Kuvempunagar","Saraswathipuram","Vani Vilas","Lakshmipuram","Market","KR Circle","Temple Road","Library","College"]},
-  2:{dep:"8:00 AM",arr:"9:00 AM",stops:["Bogadi","Vijayanagar","Ring Road","KRS Road","Hebbal","Infosys","Metagalli","Industrial Area","Signal Point","College"]},
-  3:{dep:"8:15 AM",arr:"9:10 AM",stops:["Nazarbad","Ashoka Road","Double Road","JLB Road","D Devaraj Urs","Ramaswamy","Mandi Mohalla","Circle","Park","College"]}
-};
-let interval, currentBus = 1, currentIdx = 0;
-function selectBus(id) {
-  currentBus = id;
-  document.querySelectorAll('.bus-tab').forEach(t=>t.classList.remove('active'));
-  document.getElementById('tab-'+id).classList.add('active');
-  const b = buses[id];
-  document.getElementById('dep').textContent = b.dep;
-  document.getElementById('arr').textContent = b.arr;
-  const list = document.getElementById('stopList');
-  list.innerHTML = b.stops.map((s,i)=>`
+    <script src="{{ url_for('static', filename='css/anim.js') }}"></script>
+    <script>
+      const buses = {
+        1: {
+          dep: "8:30 AM",
+          arr: "9:15 AM",
+          stops: [
+            "Main Gate",
+            "Kuvempunagar",
+            "Saraswathipuram",
+            "Vani Vilas",
+            "Lakshmipuram",
+            "Market",
+            "KR Circle",
+            "Temple Road",
+            "Library",
+            "College",
+          ],
+        },
+        2: {
+          dep: "8:00 AM",
+          arr: "9:00 AM",
+          stops: [
+            "Bogadi",
+            "Vijayanagar",
+            "Ring Road",
+            "KRS Road",
+            "Hebbal",
+            "Infosys",
+            "Metagalli",
+            "Industrial Area",
+            "Signal Point",
+            "College",
+          ],
+        },
+        3: {
+          dep: "8:15 AM",
+          arr: "9:10 AM",
+          stops: [
+            "Nazarbad",
+            "Ashoka Road",
+            "Double Road",
+            "JLB Road",
+            "D Devaraj Urs",
+            "Ramaswamy",
+            "Mandi Mohalla",
+            "Circle",
+            "Park",
+            "College",
+          ],
+        },
+      };
+      let interval,
+        currentBus = 1,
+        currentIdx = 0;
+      function selectBus(id) {
+        currentBus = id;
+        document
+          .querySelectorAll(".bus-tab")
+          .forEach((t) => t.classList.remove("active"));
+        document.getElementById("tab-" + id).classList.add("active");
+        const b = buses[id];
+        document.getElementById("dep").textContent = b.dep;
+        document.getElementById("arr").textContent = b.arr;
+        const list = document.getElementById("stopList");
+        list.innerHTML = b.stops
+          .map(
+            (s, i) => `
     <div class="stop-item" id="stop-${i}" onclick="showPopup('${s}')">
-      <div class="stop-num">${i+1}</div>
+      <div class="stop-num">${i + 1}</div>
       <div class="stop-name">${s}</div>
       <span class="bus-here">Bus Here</span>
-    </div>`).join('');
-  clearInterval(interval);
-  currentIdx = 0;
-  interval = setInterval(()=>{
-    document.querySelectorAll('.stop-item').forEach(s=>s.classList.remove('active-stop'));
-    const el = document.getElementById('stop-'+currentIdx);
-    if(el) el.classList.add('active-stop');
-    currentIdx = (currentIdx+1) % b.stops.length;
-  }, 2800);
-}
-function showPopup(name) {
-  document.getElementById('popupStop').textContent = name;
-  document.getElementById('overlay').classList.add('show');
-}
-function closePopup() { document.getElementById('overlay').classList.remove('show'); }
-selectBus(1);
-</script>
-</body>
+    </div>`,
+          )
+          .join("");
+        clearInterval(interval);
+        currentIdx = 0;
+        interval = setInterval(() => {
+          document
+            .querySelectorAll(".stop-item")
+            .forEach((s) => s.classList.remove("active-stop"));
+          const el = document.getElementById("stop-" + currentIdx);
+          if (el) el.classList.add("active-stop");
+          currentIdx = (currentIdx + 1) % b.stops.length;
+        }, 2800);
+      }
+      function showPopup(name) {
+        document.getElementById("popupStop").textContent = name;
+        document.getElementById("overlay").classList.add("show");
+      }
+      function closePopup() {
+        document.getElementById("overlay").classList.remove("show");
+      }
+      selectBus(1);
+    </script>
+  </body>
 </html>
