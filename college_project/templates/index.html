@@ -43,45 +43,6 @@
       transition: all 0.3s ease;
     }
 
-    /* --- GLOBAL MAP BACKGROUND --- */
-    .map-fixed-bg {
-      position: fixed;
-      inset: 0;
-      background: url('/static/images/cyber_map.png') center/cover no-repeat;
-      opacity: 0.2;
-      filter: grayscale(100%) brightness(0.5);
-      z-index: -2;
-      pointer-events: none;
-    }
-
-    /* --- UNIQUE HUD EFFECT (Digital Grid) --- */
-    .hud-grid-overlay {
-      position: fixed;
-      inset: 0;
-      background-image: 
-        linear-gradient(var(--neon-dim) 1px, transparent 1px),
-        linear-gradient(90deg, var(--neon-dim) 1px, transparent 1px);
-      background-size: 50px 50px;
-      opacity: 0.05;
-      z-index: -1;
-      pointer-events: none;
-    }
-
-    .scanning-line {
-      position: fixed;
-      left: 0; width: 100%; height: 2px;
-      background: var(--neon);
-      box-shadow: 0 0 20px var(--neon);
-      opacity: 0.2;
-      z-index: 0;
-      pointer-events: none;
-      animation: scan-v 10s linear infinite;
-    }
-
-    @keyframes scan-v {
-      0% { top: -10%; }
-      100% { top: 110%; }
-    }
 
     /* --- LAYOUT --- */
     .content-wrapper {
@@ -213,6 +174,7 @@
   <!-- CURSOR (UNTOUCHED) -->
   <div id="cursor"></div>
   <div id="aura"></div>
+  <canvas id="particle-field"></canvas>
 
   <!-- FIXED HUD BACKGROUNDS -->
   <div class="map-fixed-bg"></div>

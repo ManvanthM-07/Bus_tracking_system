@@ -8,6 +8,144 @@
   --glass-border: rgba(255, 255, 255, 0.08);
   --text-main: #ffffff;
   --text-dim: rgba(255, 255, 255, 0.5);
+  --white: #ffffff;
+  --cyan: var(--neon-cyan);
+  --muted: var(--text-dim);
+  --bg-dark: var(--cosmic-black);
+}
+
+/* --- COMMON COMPONENTS --- */
+.page-scene {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  position: relative;
+  z-index: 10;
+}
+
+.card {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(15px);
+  border-radius: 24px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+  transition: border-color 0.3s, transform 0.3s;
+}
+
+.card:hover {
+  border-color: rgba(0, 242, 255, 0.2);
+}
+
+.input-group {
+  margin-bottom: 20px;
+  width: 100%;
+}
+
+.input-label {
+  display: block;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--cyan);
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.input-box {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  padding: 14px 18px;
+  color: #fff;
+  font-family: inherit;
+  font-size: 15px;
+  transition: all 0.3s;
+}
+
+.input-box:focus {
+  outline: none;
+  border-color: var(--cyan);
+  background: rgba(0, 242, 255, 0.05);
+  box-shadow: 0 0 20px rgba(0, 242, 255, 0.1);
+}
+
+.btn-primary {
+  width: 100%;
+  padding: 16px;
+  background: var(--cyan);
+  border: none;
+  border-radius: 12px;
+  color: #000;
+  font-weight: 700;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: all 0.3s;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.btn-primary:hover {
+  box-shadow: 0 0 30px var(--cyan);
+  transform: translateY(-2px);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+.password-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.toggle-eye {
+  position: absolute;
+  right: 15px;
+  cursor: pointer;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+}
+
+.toggle-eye:hover {
+  color: var(--white);
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  background: rgba(0, 242, 255, 0.1);
+  border: 1px solid rgba(0, 242, 255, 0.2);
+  border-radius: 100px;
+  font-size: 11px;
+  color: var(--cyan);
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
+.badge-dot {
+  width: 6px;
+  height: 6px;
+  background: var(--cyan);
+  border-radius: 50%;
+  box-shadow: 0 0 10px var(--cyan);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.5); opacity: 0.5; }
+  100% { transform: scale(1); opacity: 1; }
 }
 
 * {
@@ -369,4 +507,56 @@ body {
   position: absolute;
   background: var(--neon-cyan);
   box-shadow: 0 0 10px var(--neon-cyan);
+}
+
+/* --- GLOBAL BACKGROUND EFFECTS --- */
+.map-fixed-bg {
+  position: fixed;
+  inset: 0;
+  background: url('/static/images/cyber_map.png') center/cover no-repeat;
+  opacity: 0.2;
+  filter: grayscale(100%) brightness(0.5);
+  z-index: -2;
+  pointer-events: none;
+}
+
+.hud-grid-overlay {
+  position: fixed;
+  inset: 0;
+  background-image: 
+    linear-gradient(rgba(0, 242, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 242, 255, 0.05) 1px, transparent 1px);
+  background-size: 50px 50px;
+  opacity: 0.1;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.scanning-line {
+  position: fixed;
+  left: 0; width: 100%; height: 2px;
+  background: var(--neon-cyan);
+  box-shadow: 0 0 20px var(--neon-cyan);
+  opacity: 0.2;
+  z-index: 0;
+  pointer-events: none;
+  animation: scan-v 10s linear infinite;
+}
+
+@keyframes scan-v {
+  0% { top: -10%; }
+  100% { top: 110%; }
+}
+
+/* --- CINEMATIC BACKDROP --- */
+.cinematic-backdrop {
+  position: fixed;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  opacity: 0.4;
+  filter: saturate(1) brightness(0.7);
+  z-index: -1;
+  pointer-events: none;
+  transition: opacity 0.5s ease;
 }

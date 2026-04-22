@@ -16,8 +16,6 @@
         width: 100%;
         max-width: 420px;
         padding: 40px 36px;
-        margin-top: 60px;
-        margin-bottom: 40px;
       }
       .signup-head {
         text-align: center;
@@ -68,9 +66,20 @@
     </style>
   </head>
   <body>
-    <canvas id="stars"></canvas>
-    <div class="road-plane"></div>
-    <div class="particles" id="particles"></div>
+    <!-- CURSOR -->
+    <div id="cursor"></div>
+    <div id="aura"></div>
+
+    <!-- BACKGROUND EFFECTS -->
+    <canvas id="particle-field"></canvas>
+    <div class="map-fixed-bg"></div>
+    <div class="hud-grid-overlay"></div>
+    <div class="scanning-line"></div>
+
+    <!-- ROLE SPECIFIC BACKDROP -->
+    {% if role == 'student' %}
+    <div class="cinematic-backdrop" style="background-image: url('/static/images/student_bus.png');"></div>
+    {% endif %}
 
     <a href="/{{ role }}" class="back-link">
       <svg
