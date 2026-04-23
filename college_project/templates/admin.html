@@ -7,20 +7,24 @@
       rel="stylesheet"
       href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
     />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}"
+    />
     <style>
       :root {
-        --primary: #ffe082;
-        --accent: #facc15;
-        --bg-dark: #0f172a;
-        --card-bg: rgba(255, 255, 255, 0.08); /* Darker glassmorphism */
-        --glass: rgba(255, 255, 255, 0.1);
+        --primary: var(--neon-cyan);
+        --accent: var(--neon-purple);
+        --bg-dark: var(--cosmic-black);
+        --card-bg: rgba(255, 255, 255, 0.05);
+        --glass: var(--glass-white);
         --transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
       }
 
       body {
         margin: 0;
-        font-family: "Outfit", sans-serif;
-        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        font-family: "Space Grotesk", sans-serif;
+        background: var(--bg-dark);
         color: white;
         height: 100vh;
         display: flex;
@@ -58,11 +62,11 @@
       }
 
       .box {
-        background: var(--card-bg);
-        border-radius: 20px;
-        padding: 25px;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        backdrop-filter: blur(12px);
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 24px;
+        padding: 30px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        backdrop-filter: blur(15px);
         display: flex;
         flex-direction: column;
         overflow: hidden;
@@ -247,26 +251,17 @@
     </style>
   </head>
   <body>
-    <div class="admin-header">
-      <h2 style="margin: 0">
+    <div id="cursor"></div>
+    <div id="aura"></div>
+
+    <header class="admin-header">
+      <h1 style="margin: 0; font-size: 1.5rem; color: var(--primary)">
         Admin Console
-        <span style="font-weight: 300; font-size: 0.8rem; opacity: 0.6"
-          >v2.0</span
-        >
-      </h2>
-      <div style="display: flex; gap: 20px; align-items: center">
-        <span>Welcome, <strong>{{ user.full_name }}</strong></span>
-        <a
-          href="/logout"
-          style="
-            color: var(--primary);
-            text-decoration: none;
-            font-size: 0.9rem;
-          "
-          >Logout</a
-        >
-      </div>
-    </div>
+      </h1>
+      <a href="/logout" class="submit-btn" style="text-decoration: none"
+        >Logout</a
+      >
+    </header>
 
     <div class="dashboard-main">
       <div class="grid-container" id="mainGrid">
@@ -329,31 +324,33 @@
             onsubmit="event.stopPropagation()"
           >
             <div
-              style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px"
+              style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px"
             >
               <input
                 type="text"
                 name="id"
-                placeholder="Bus Number (e.g. 5)"
+                placeholder="Bus ID (e.g. 1)"
                 required
               />
-              <div
-                style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px"
-              >
-                <input
-                  type="text"
-                  name="route_from"
-                  placeholder="From (e.g. City)"
-                  required
-                />
-                <input
-                  type="text"
-                  name="route_to"
-                  placeholder="To (e.g. Campus)"
-                  required
-                />
-              </div>
+              <input
+                type="text"
+                name="route_from"
+                placeholder="From"
+                required
+              />
+              <input
+                type="text"
+                name="route_to"
+                placeholder="To"
+                required
+              />
             </div>
+            <input
+              type="text"
+              name="driver_name"
+              placeholder="Driver Name"
+              required
+            />
 
             <div id="stopsContainer">
               <label
@@ -406,6 +403,7 @@
                   <th>Name</th>
                   <th>Role</th>
                   <th>Details</th>
+                  <th>Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -424,6 +422,14 @@
                   </td>
                   <td>
                     {% if u.assigned_bus %}Bus {{ u.assigned_bus }}{% endif %}
+                  </td>
+                  <td>
+                    <a href="/delete_user/{{ u.id }}" 
+                       class="submit-btn" 
+                       style="background: #ff4d4d; color: white; padding: 5px 10px; font-size: 0.8rem;"
+                       onclick="return confirm('Are you sure you want to remove this user?')">
+                       Remove
+                    </a>
                   </td>
                 </tr>
                 {% endfor %}
@@ -504,5 +510,6 @@
           if (box.id === 'mapBox') setTimeout(() => map.invalidateSize(), 400);
       }
     </script>
+    <script src="{{ url_for('static', filename='css/anim.js') }}"></script>
   </body>
 </html>

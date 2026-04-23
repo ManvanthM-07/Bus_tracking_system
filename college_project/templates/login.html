@@ -79,25 +79,13 @@
     <div class="hud-grid-overlay"></div>
     <div class="scanning-line"></div>
 
-    <!-- ROLE SPECIFIC BACKDROP -->
-    {% if role == 'student' %}
-    <div class="cinematic-backdrop" style="background-image: url('/static/images/student_bus.png');"></div>
-    {% endif %}
-
-    <a href="/home" class="back-link">
-      <svg
-        width="16"
-        height="16"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-        stroke-linecap="round"
-      >
-        <path d="M19 12H5M12 5l-7 7 7 7" />
-      </svg>
-      Back
-    </a>
+    <nav class="topbar">
+      <div class="topbar-brand">BusTrack</div>
+      <a href="/home" class="badge" style="text-decoration:none;">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="margin-right:4px;"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+        Back to Home
+      </a>
+    </nav>
 
     <div class="page-scene">
       <div class="card login-wrap">
@@ -120,6 +108,18 @@
           id="loginForm"
           onsubmit="startLoading()"
         >
+          {% if role == 'driver' %}
+          <div class="input-group">
+            <label class="input-label">Bus Number</label>
+            <input
+              class="input-box"
+              type="text"
+              name="bus_id"
+              placeholder="e.g. 1"
+              required
+            />
+          </div>
+          {% endif %}
           <div class="input-group">
             <label class="input-label">Username</label>
             <input
@@ -186,9 +186,16 @@
         </form>
 
         {% if role != 'admin' %}
-        <div class="form-footer">
-          Don't have an account? <a href="/signup/{{ role }}">Sign Up</a>
-        </div>
+          {% if role != 'driver' %}
+          <p class="auth-footer">
+            Don't have an account?
+            <a href="/signup/{{ role }}" class="auth-link">Sign up here</a>
+          </p>
+          {% else %}
+          <p class="auth-footer" style="opacity:0.6; font-size:12px;">
+            Driver accounts are managed by the Principal.
+          </p>
+          {% endif %}
         {% endif %}
       </div>
     </div>

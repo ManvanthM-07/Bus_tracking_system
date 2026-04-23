@@ -9,189 +9,153 @@
       href="{{ url_for('static', filename='css/style.css') }}"
     />
     <style>
-      body {
-        overflow-y: auto;
-      }
-      .dash-wrap {
+      .driver-dashboard {
+        display: flex;
+        gap: 30px;
         width: 100%;
-        max-width: 400px;
-        padding: 36px 28px;
-        margin-top: 60px;
-        margin-bottom: 40px;
+        max-width: 1400px;
+        height: 80vh;
+        z-index: 10;
       }
-      .dash-head {
-        display: flex;
-        align-items: center;
-        gap: 14px;
-        margin-bottom: 20px;
-      }
-      .avatar {
-        width: 48px;
-        height: 48px;
-        border-radius: 14px;
-        background: linear-gradient(135deg, #f59e0b, #ef4444);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 20px;
-        font-weight: 800;
-        color: #fff;
-        flex-shrink: 0;
-      }
-      .dash-head-info h2 {
-        font-size: 18px;
-        font-weight: 700;
-      }
-      .dash-head-info p {
-        font-size: 13px;
-        color: var(--muted);
-      }
-      .bus-chip {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        background: rgba(245, 158, 11, 0.1);
-        border: 1px solid rgba(245, 158, 11, 0.3);
-        border-radius: 10px;
-        padding: 10px 14px;
-        font-size: 13px;
-        font-weight: 600;
-        color: #fbbf24;
-        margin-bottom: 16px;
-      }
-      .menu-list {
+      .students-panel {
+        flex: 1;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid var(--glass-border);
+        backdrop-filter: blur(20px);
+        border-radius: 24px;
+        padding: 30px;
         display: flex;
         flex-direction: column;
-        gap: 8px;
+        overflow: hidden;
       }
-      .menu-icon svg {
-        width: 18px;
-        height: 18px;
+      .map-panel {
+        flex: 2;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid var(--glass-border);
+        backdrop-filter: blur(20px);
+        border-radius: 24px;
+        overflow: hidden;
+        position: relative;
+      }
+      #map {
+        width: 100%;
+        height: 100%;
+      }
+      .student-card {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 16px;
+        padding: 16px;
+        margin-bottom: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        transition: 0.3s;
+      }
+      .student-card:hover {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: var(--neon-cyan);
+      }
+      .student-name {
+        font-weight: 700;
+        font-size: 1.1rem;
+        color: var(--white);
+        margin-bottom: 4px;
+      }
+      .student-stop {
+        font-size: 0.85rem;
+        color: var(--neon-cyan);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .student-list-scroll {
+        overflow-y: auto;
+        padding-right: 10px;
+      }
+      .panel-header {
+        margin-bottom: 20px;
+        border-bottom: 1px solid var(--glass-border);
+        padding-bottom: 15px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .panel-title {
+        font-size: 1.3rem;
+        font-weight: 800;
+        color: var(--white);
       }
     </style>
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   </head>
   <body>
-    <canvas id="stars"></canvas>
-    <div class="road-plane"></div>
-    <div class="particles" id="particles"></div>
+    <div id="cursor"></div>
+    <div id="aura"></div>
+    <div class="hud-grid-overlay"></div>
 
     <nav class="topbar">
-      <span class="topbar-brand">BusTrack</span>
-      <div class="topbar-right">
-        <span class="topbar-badge"
-          ><span class="topbar-dot"></span>On Route</span
-        >
-        <a href="/logout" class="topbar-logout">Sign Out</a>
+      <div style="display:flex; align-items:center; gap:16px;">
+        <span class="topbar-brand">BusTrack Driver</span>
+      </div>
+      <div style="display:flex; gap:20px; align-items:center;">
+        <span class="badge" style="background:rgba(245,158,11,0.1); border-color:rgba(245,158,11,0.3); color:#fbbf24;">
+          <span class="badge-dot" style="background:#fbbf24;"></span>
+          Bus {{ user.assigned_bus }} Active
+        </span>
+        <a href="/logout" class="badge" style="text-decoration:none; border-color:rgba(239,68,68,0.3); color:#f87171;">Logout</a>
       </div>
     </nav>
 
     <div class="page-scene">
-      <div class="card dash-wrap">
-        <div class="dash-head">
-          <div class="avatar">
-            {{ (user.full_name or user.username)[0]|upper }}
+      <div class="driver-dashboard">
+        <!-- Left Panel: Students -->
+        <div class="students-panel">
+          <div class="panel-header">
+            <div class="panel-title">👥 Assigned Students</div>
+            <div style="font-size: 0.8rem; color: var(--muted)">{{ students|length }} Students</div>
           </div>
-          <div class="dash-head-info">
-            <h2>{{ user.full_name or user.username }}</h2>
-            <p>Driver Account</p>
+          <div class="student-list-scroll">
+            {% if students %}
+              {% for s in students %}
+              <div class="student-card">
+                <div class="student-name">{{ s.full_name }}</div>
+                <div class="student-stop">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                  Stop: {{ s.assigned_stop or 'Not Set' }}
+                </div>
+              </div>
+              {% endfor %}
+            {% else %}
+              <p style="text-align:center; opacity:0.5; margin-top:50px;">No students assigned to this bus.</p>
+            {% endif %}
           </div>
         </div>
 
-        <div class="bus-chip">
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-          >
-            <rect x="2" y="7" width="20" height="14" rx="2" />
-            <circle cx="7" cy="21" r="1" />
-            <circle cx="17" cy="21" r="1" />
-            <path d="M2 11h20M12 7V3M8 7V3M16 7V3" />
-          </svg>
-          Assigned Bus: {{ user.assigned_bus or "No Bus Assigned" }}
-        </div>
-
-        <div class="divider"></div>
-        <div class="menu-list">
-          <div class="menu-btn" id="btn-location">
-            <div class="menu-icon">
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="#06b6d4"
-                stroke-width="2"
-                stroke-linecap="round"
-              >
-                <circle cx="12" cy="12" r="10" />
-                <circle cx="12" cy="12" r="3" />
-                <line x1="12" y1="2" x2="12" y2="6" />
-                <line x1="12" y1="18" x2="12" y2="22" />
-                <line x1="2" y1="12" x2="6" y2="12" />
-                <line x1="18" y1="12" x2="22" y2="12" />
-              </svg>
-            </div>
-            Update Location
-          </div>
-
-          <a href="/route_details" class="menu-btn" id="btn-route">
-            <div class="menu-icon">
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="#f59e0b"
-                stroke-width="2"
-                stroke-linecap="round"
-              >
-                <path d="M3 12h18M3 6h18M3 18h18" />
-              </svg>
-            </div>
-            Route Details
-          </a>
-
-          <div class="menu-btn" id="btn-notif">
-            <div class="menu-icon">
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="#a78bfa"
-                stroke-width="2"
-                stroke-linecap="round"
-              >
-                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
-                <path d="M13.73 21a2 2 0 0 1-3.46 0" />
-              </svg>
-            </div>
-            Notifications
-          </div>
-
-          <a
-            href="/logout"
-            class="menu-btn"
-            id="btn-logout"
-            style="color: rgba(248, 113, 113, 0.85)"
-          >
-            <div class="menu-icon">
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="#f87171"
-                stroke-width="2"
-                stroke-linecap="round"
-              >
-                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-                <polyline points="16 17 21 12 16 7" />
-                <line x1="21" y1="12" x2="9" y2="12" />
-              </svg>
-            </div>
-            Sign Out
-          </a>
+        <!-- Right Panel: Map -->
+        <div class="map-panel">
+          <div id="map"></div>
         </div>
       </div>
     </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+      // Initialize Map
+      var map = L.map('map').setView([12.9716, 77.5946], 13);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          maxZoom: 19,
+      }).addTo(map);
+
+      // Simulation of current bus location
+      var busMarker = L.marker([12.9716, 77.5946], {
+          icon: L.divIcon({
+              className: 'custom-div-icon',
+              html: "<div style='background-color:#fbbf24; width:15px; height:15px; border-radius:50%; border:2px solid white; box-shadow:0 0 10px #fbbf24;'></div>",
+              iconSize: [15, 15],
+              iconAnchor: [7, 7]
+          })
+      }).addTo(map).bindPopup("Current Position - Bus {{ user.assigned_bus }}");
+    </script>
     <script src="{{ url_for('static', filename='css/anim.js') }}"></script>
   </body>
 </html>
