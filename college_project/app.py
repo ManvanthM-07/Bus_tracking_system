@@ -50,6 +50,7 @@ def signup(role):
             "password": request.form.get("password"),
             "role": role,
             "student_name": request.form.get("student_name"),
+            "parent_name": request.form.get("parent_name"),
             "assigned_bus": request.form.get("assigned_bus"),
             "assigned_stop": request.form.get("assigned_stop")
         }
